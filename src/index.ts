@@ -15,33 +15,33 @@ app.use(express.json())
 
 app.use('/api/auth', AuthRoutes)
 
-async function ConsumeReq() {
-    const amqpServer = "amqp://localhost"
+// async function ConsumeReq() {
+//     const amqpServer = "amqp://localhost"
 
-    const connection = await amqp.connect(amqpServer)
-    const channel = await connection.createChannel()
+//     const connection = await amqp.connect(amqpServer)
+//     const channel = await connection.createChannel()
 
-    await channel.assertExchange('logger', 'direct')
+//     await channel.assertExchange('logger', 'direct')
 
-    let q = await channel.assertQueue('InfoQueue')
-    await channel.bindQueue(q.queue, 'logger', "Rush")
-    await channel.consume(q.queue, async (msg) => {
-        const user = JSON.parse(msg.content.toString())
-        let result = Token.decode(user.token)
-        if (result?.payload) {
-            let result2 = await User.findById<IUser>(result.payload)
-            let data = {
-                status: 200,
-                user: result2
-            }
-            channel.publish('logger', 'Receive', Buffer.from(JSON.stringify(data)))
-            channel.ack(msg)
-        }
-    })
-}
+//     let q = await channel.assertQueue('InfoQueue')
+//     await channel.bindQueue(q.queue, 'logger', "Rush")
+//     await channel.consume(q.queue, async (msg) => {
+//         const user = JSON.parse(msg.content.toString())
+//         let result = Token.decode(user.token)
+//         if (result?.payload) {
+//             let result2 = await User.findById<IUser>(result.payload)
+//             let data = {
+//                 status: 200,
+//                 user: result2
+//             }
+//             channel.publish('logger', 'Receive', Buffer.from(JSON.stringify(data)))
+//             channel.ack(msg)
+//         }
+//     })
+// }
 
 
-ConsumeReq()
+// ConsumeReq()
 
 function Run(): void {
     const PORT = process.env.PORT || 8000
